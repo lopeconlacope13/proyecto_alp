@@ -28,10 +28,20 @@ final class BaseController extends AbstractController{
         //recogemos los datos de entrada
         $productos_id = $request->request->get("productos_id");
         $unidades = $request->request->get("unidades");
-        $productos = $em->getRepository(Producto::class) -> findProductosByIds();
+        $productos = $em->getRepository(Producto::class) -> findProductosByIds($productos_id);
+        
+        
         
         //Llamamos a cargaproductos para añadirlos a la cesta con sus unidades
         $cesta->cargar_productos($productos, $unidades);
+        
+        $objetos_producto = array_values($productos);
+        
+        //Extraemos la categoria del objeto producto en posicion 0, luego su categoria y finalmente el ID
+        $categoria_id = $objetos_producto[0] -> getCategoria() -> getId();
+        
+        
+        
         return $this->redirectToRoute("productos", ['categoria'=>$productos->get]);
 
     }

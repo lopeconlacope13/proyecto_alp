@@ -24,12 +24,9 @@ class Categoria
     /**
      * @var Collection<int, Producto>
      */
-    #[ORM\OneToMany(mappedBy: 'categoria', targetEntity: Producto::class)]
-    private Collection $productos; // [cite: 642, 645]
+    #[ORM\OneToMany(targetEntity: Producto::class, mappedBy: 'categoria')]
+    private Collection $productos;
 
-    /**
-     * Constructor para inicializar la colección de productos [cite: 643]
-     */
     public function __construct()
     {
         $this->productos = new ArrayCollection();
@@ -92,13 +89,5 @@ class Categoria
         }
 
         return $this;
-    }
-
-    /**
-     * Permite que esta entidad se muestre como un string (ej. en EasyAdmin)
-     */
-    public function __toString(): string
-    {
-        return $this->nombre ?? 'Categoría';
     }
 }

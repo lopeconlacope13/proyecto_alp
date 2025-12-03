@@ -39,9 +39,6 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $phone = null;
 
-    #[ORM\Column]
-    private bool $isVerified = false;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -146,16 +143,22 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    
+    // Elimina esta línea:
+#[ORM\Column]
+private bool $isVerified = false;
 
-    public function isVerified(): bool
-    {
-        return $this->isVerified;
-    }
+public function isVerified(): bool
+{
+    return $this->isVerified;
+}
 
-    public function setIsVerified(bool $isVerified): static
-    {
-        $this->isVerified = $isVerified;
+public function setIsVerified(bool $isVerified): static
+{
+    $this->isVerified = $isVerified;
+    return $this;
+}
 
-        return $this;
-    }
+
+
 }
