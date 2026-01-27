@@ -1,0 +1,39 @@
+{# empty Twig template #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Resultado del Pedido{% endblock %}
+
+{% block body %}
+<div class="container mt-5 text-center">
+    
+    {% if error == 0 %}
+        {# CASO DE ÉXITO #}
+        <div class="alert alert-success">
+            <h1 class="alert-heading">¡Pedido Realizado!</h1>
+            <p>Gracias por tu compra.</p>
+            <hr>
+            <p class="mb-0">El número de registro de tu pedido es: <strong>{{ pedido_id }}</strong></p>
+        </div>
+        <a href="{{ path('categorias') }}" class="btn btn-primary">Volver al inicio</a>
+
+    {% elseif error == 1 %}
+        {# CASO CESTA VACÍA #}
+        <div class="alert alert-warning">
+            <h1>Cesta Vacía</h1>
+            <p>No puedes tramitar un pedido sin productos.</p>
+        </div>
+        <a href="{{ path('categorias') }}" class="btn btn-primary">Ir a comprar</a>
+
+    {% elseif error == 2 %}
+        {# CASO ERROR BD #}
+        <div class="alert alert-danger">
+            <h1>Error del Sistema</h1>
+            <p>Ha ocurrido un problema al guardar tu pedido en la base de datos.</p>
+            <p>Por favor, inténtalo de nuevo más tarde.</p>
+        </div>
+        <a href="{{ path('cesta') }}" class="btn btn-secondary">Volver a la cesta</a>
+
+    {% endif %}
+    
+</div>
+{% endblock %}

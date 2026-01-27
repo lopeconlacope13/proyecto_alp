@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UsuarioRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -148,6 +150,17 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
 #[ORM\Column]
 private bool $isVerified = false;
 
+/**
+ * @var Collection<int, Pedido>
+ */
+#[ORM\OneToMany(targetEntity: Pedido::class, mappedBy: 'usuario', orphanRemoval: true)]
+private Collection $pedidos;
+
+public function __construct()
+{
+    $this->pedidos = new ArrayCollection();
+}
+
 public function isVerified(): bool
 {
     return $this->isVerified;
@@ -156,6 +169,36 @@ public function isVerified(): bool
 public function setIsVerified(bool $isVerified): static
 {
     $this->isVerified = $isVerified;
+    return $this;
+}
+
+/**
+ * @return Collection<int, Pedido>
+ */
+public function getPedidos(): Collection
+{
+    return $this->pedidos;
+}
+
+public function addPedido(Pedido $pedido): static
+{
+    if (!$this->pedidos->contains($pedido)) {
+        $this->pedidos->add($pedido);
+        $pedido->setUsuario($this);
+    }
+
+    return $this;
+}
+
+public function removePedido(Pedido $pedido): static
+{
+    if ($this->pedidos->removeElement($pedido)) {
+        // set the owning side to null (unless already changed)
+        if ($pedido->getUsuario() === $this) {
+            $pedido->setUsuario(null);
+        }
+    }
+
     return $this;
 }
 
