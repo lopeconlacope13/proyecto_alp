@@ -19,7 +19,8 @@ class PedidoProducto
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?producto $producto = null;
+    // CORREGIDO: P mayúscula en Producto
+    private ?Producto $producto = null;
 
     #[ORM\Column]
     private ?int $unidades = null;
@@ -44,12 +45,14 @@ class PedidoProducto
         return $this;
     }
 
-    public function getProducto(): ?producto
+    // CORREGIDO: P mayúscula en el tipo de retorno
+    public function getProducto(): ?Producto
     {
         return $this->producto;
     }
 
-    public function setProducto(?producto $producto): static
+    // CORREGIDO: P mayúscula en el argumento
+    public function setProducto(?Producto $producto): static
     {
         $this->producto = $producto;
 

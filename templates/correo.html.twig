@@ -1,0 +1,35 @@
+{# empty Twig template #}
+{# empty Twig template #}
+
+{# 1. CORRECCIÓN: Usamos 'login' porque 'nombre' no existe en tu base de datos #}
+<h1>¡Gracias por su compra {{ app.user.login }}!</h1>
+
+<h2>Identificador de su pedido: #{{ pedido_id }}</h2>
+
+<h2>Resumen de su compra: </h2>
+
+<table border="1" style="width: 100%; border-collapse: collapse; text-align: left;">
+    <tr>
+        <th style="padding: 8px;">Código</th>
+        <th style="padding: 8px;">Nombre</th>
+        <th style="padding: 8px;">Descripción</th>
+        <th style="padding: 8px;">Precio y unidades</th>
+        <th style="padding: 8px;">Subtotal</th>
+    </tr>
+    {% for codigo, producto in productos %}
+      <tr>
+       <td style="padding: 8px;">{{ codigo }}</td>
+       {# En Twig no hace falta poner getNombre(), basta con poner .nombre (él ya busca el getter solo) #}
+       <td style="padding: 8px;">{{ producto.nombre }}</td>
+       <td style="padding: 8px;">{{ producto.descripcion }}</td>
+       
+       <td style="padding: 8px;">{{ producto.precio }}€ x {{ unidades[codigo] }}</td>
+       
+       {# Calculamos el subtotal de esta fila multiplicando precio por unidades #}
+       <td style="padding: 8px;">{{ producto.precio * unidades[codigo] }}€</td>
+      </tr>
+    {% endfor %}
+</table>
+
+{# 2. CORRECCIÓN: En el controlador pasaste la variable 'coste', no 'precioTotal' #}
+<p style="font-size: 1.2em;"><strong>Precio total: {{ coste }}€</strong></p>

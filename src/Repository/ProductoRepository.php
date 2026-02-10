@@ -16,39 +16,14 @@ class ProductoRepository extends ServiceEntityRepository
         parent::__construct($registry, Producto::class);
     }
 
-    //    /**
-    //     * @return Producto[] Returns an array of Producto objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Producto
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
-    
-    public function findProductsByIds(array $productos_ids):array {
-        $em = $this->getEntityManager();
-        $productos = [];
-        foreach ($productos_ids as $producto_id){
-            $producto = $en-> getRepository(Producto::class) -> find($producto_id);
-            $productos[] = $producto;
-        }
-        return $productos;
+    /**
+     * Busca productos por una lista de IDs
+     * Coincide con la llamada del controlador: findProductosByIds
+     */
+    public function findProductosByIds(array $productos_ids): array 
+    {
+        // Esta sola línea hace lo mismo que tu bucle foreach, 
+        // pero es automático y sin errores de variables.
+        return $this->findBy(['id' => $productos_ids]);
     }
-
-   }
+}

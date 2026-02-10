@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mis Pedidos{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <h1 class="mb-4" style="color: var(--color-oscuro); font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">
+        📜 Historial de Pedidos
+    </h1>
+
+    {# Verificamos si la lista de pedidos está vacía #}
+    {% if pedidos is empty %}
+        <div class="alert alert-warning shadow-sm" role="alert" style="border-left: 5px solid var(--color-ferreteria);">
+            <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> ¡Aún no tienes pedidos!</h4>
+            <p>Parece que tu caja de herramientas está vacía.</p>
+            <hr>
+            <a href="{{ path('categorias') }}" class="btn btn-primary">
+                <i class="fas fa-shopping-cart"></i> Ir al catálogo
+            </a>
+        </div>
+    {% else %}
+    
+        {# BUCLE PRINCIPAL: Recorre la lista de pedidos enviada por el controlador #}
+        {% for pedido in pedidos %}
+            <div class="card mb-4 shadow-sm">
+                {# Encabezado de la tarjeta con los datos generales del pedido #}
+                <div class="card-header d-flex justify-content-between align-items-center" 
+                     style="background-color: var(--color-oscuro); color: white;">
+                    <div>
+                        <span style="font-weight: bold; font-size: 1.1rem;">
+                            <i class="fas fa-box-open"></i> PEDIDO #{{ pedido.code }}
+                        </span>
+                        <span style="font-size: 0.9rem; opacity: 0.8; margin-left: 10px;">
+                            {{ pedido.fecha|date('d/m/Y H:i') }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="badge bg-success">Confirmado</span>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Cód.</th>
+                                    <th>Producto</th>
+                                    <th class="text-center">Precio Unit.</th>
+                                    <th class="text-center">Unidades</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {# SUB-BUCLE: Recorre las líneas de productos de ESTE pedido #}
+                                {# Gracias al getter que añadimos en la Entidad, esto ahora funciona #}
+                                {% for linea in pedido.pedidoProductos %}
+                                    <tr>
+                                        <td><small class="text-muted">{{ linea.producto.codigo }}</small></td>
+                                        <td style="font-weight: 600; color: var(--color-oscuro);">
+                                            {{ linea.producto.nombre }}
+                                        </td>
+                                        <td class="text-center">{{ linea.producto.precio }} €</td>
+                                        <td class="text-center">{{ linea.unidades }}</td>
+                                        <td class="text-end">
+                                            {{ linea.producto.precio * linea.unidades }} €
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" class="text-end border-0 pt-3">
+                                        <strong style="font-size: 1.1rem; color: var(--color-oscuro);">TOTAL PEDIDO:</strong>
+                                    </td>
+                                    <td class="text-end border-0 pt-3">
+                                        <span style="font-size: 1.5rem; font-weight: bold; color: var(--color-ferreteria);">
+                                            {{ pedido.coste }} €
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        
+    {% endif %}
+    
+    <div class="mt-4">
+        <a href="{{ path('categorias') }}" class="btn btn-outline-secondary">
+            ⬅ Volver a la tienda
+        </a>
+    </div>
+</div>
+{% endblock %}
