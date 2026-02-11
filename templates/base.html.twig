@@ -24,6 +24,8 @@
                 
                 <div class="collapse navbar-collapse" id="navbarMain">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0 fw-bold">
+                        
+                        {# 1. ENLACES PÚBLICOS #}
                         <li class="nav-item">
                             <a class="nav-link text-white" href="{{ path('categorias') }}">Categorías</a>
                         </li>
@@ -33,22 +35,33 @@
                             </a>
                         </li>
 
+                        {# 2. ZONA DE USUARIO LOGUEADO #}
                         {% if app.user %}
-                            {# Botón corregido: Apunta a la ruta 'pedidos' #}
+                            
+                            {# ---> AQUÍ ESTÁ EL CAMBIO: SOLO PARA EL JEFE <--- #}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li class="nav-item">
+                                    <a class="nav-link text-danger fw-bold border border-danger rounded ms-2 me-2" href="{{ path('dashboard') }}">
+                                        <i class="fas fa-cogs"></i> Panel Admin
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {# ------------------------------------------------ #}
+
                             <li class="nav-item">
                                 <a class="nav-link text-white" href="{{ path('pedidos') }}">
                                     <i class="fas fa-clipboard-list text-warning"></i> Mis Pedidos
                                 </a>
                             </li>
 
-                            {# CORREGIDO: Usamos 'logout' en lugar de 'app_logout' #}
                             <li class="nav-item ms-3">
                                 <a class="nav-link text-warning border border-warning rounded px-3" href="{{ path('logout') }}">
                                     <i class="fas fa-sign-out-alt"></i> Salir
                                 </a>
                             </li>
+                        
+                        {# 3. ZONA DE INVITADO (NO LOGUEADO) #}
                         {% else %}
-                            {# CORREGIDO: Usamos 'login' en lugar de 'app_login' #}
                             <li class="nav-item ms-3">
                                 <a class="nav-link text-warning border border-warning rounded px-3" href="{{ path('login') }}">
                                     <i class="fas fa-user"></i> Login
