@@ -12,8 +12,9 @@ use App\Entity\Producto;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use App\Entity\Usuario;
 use App\Entity\Pedido;
+use Symfony\Component\Security\Core\Role;
 
-
+#[IsGranted('ROLE_ADMIN')]
 #[AdminDashboard(routePath: '/dashboard', routeName: 'dashboard')]
 class DashboardController extends AbstractDashboardController
 {

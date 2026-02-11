@@ -23,23 +23,33 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180)]
     private ?string $login = null;
 
-    /**
-     * @var list<string> The user roles
-     */
     #[ORM\Column]
     private array $roles = [];
 
-    /**
-     * @var string The hashed password
-     */
     #[ORM\Column]
     private ?string $password = null;
+
+    // --- AÑADIDO: Variable temporal para la contraseña en texto plano ---
+    // No lleva #[ORM\Column] porque NO se guarda en base de datos
+    private ?string $plainPassword = null;
+    // ------------------------------------------------------------------
 
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $phone = null;
+
+    #[ORM\Column]
+    private bool $isVerified = false;
+
+    #[ORM\OneToMany(targetEntity: Pedido::class, mappedBy: 'usuario', orphanRemoval: true)]
+    private Collection $pedidos;
+
+    public function __construct()
+    {
+        $this->pedidos = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -54,45 +64,27 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLogin(string $login): static
     {
         $this->login = $login;
-
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
     public function getUserIdentifier(): string
     {
         return (string) $this->login;
     }
 
-    /**
-     * @see UserInterface
-     */
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
-
         return array_unique($roles);
     }
 
-    /**
-     * @param list<string> $roles
-     */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
-
         return $this;
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -101,25 +93,35 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): static
     {
         $this->password = $password;
-
         return $this;
     }
 
-    /**
-     * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
-     */
-    public function __serialize(): array
+    public function getPlainPassword(): ?string
     {
-        $data = (array) $this;
-        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
-
-        return $data;
+        return $this->plainPassword;
     }
 
-    #[\Deprecated]
+    public function setPlainPassword(?string $plainPassword): static
+    {
+        $this->plainPassword = $plainPassword;
+        return $this;
+    }
+    // ---------------------------------------------------
+
+    public function __serialize(): array
+    {
+        // Método simplificado para evitar problemas de sesión
+        return [
+            'id' => $this->id,
+            'login' => $this->login,
+            'password' => $this->password,
+        ];
+    }
+
     public function eraseCredentials(): void
     {
-        // @deprecated, to be removed when upgrading to Symfony 8
+        // --- MODIFICADO: Limpiamos la contraseña temporal ---
+        $this->plainPassword = null;
     }
 
     public function getEmail(): ?string
@@ -130,7 +132,6 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -142,66 +143,41 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPhone(?string $phone): static
     {
         $this->phone = $phone;
-
         return $this;
     }
-    
-    // Elimina esta línea:
-#[ORM\Column]
-private bool $isVerified = false;
 
-/**
- * @var Collection<int, Pedido>
- */
-#[ORM\OneToMany(targetEntity: Pedido::class, mappedBy: 'usuario', orphanRemoval: true)]
-private Collection $pedidos;
-
-public function __construct()
-{
-    $this->pedidos = new ArrayCollection();
-}
-
-public function isVerified(): bool
-{
-    return $this->isVerified;
-}
-
-public function setIsVerified(bool $isVerified): static
-{
-    $this->isVerified = $isVerified;
-    return $this;
-}
-
-/**
- * @return Collection<int, Pedido>
- */
-public function getPedidos(): Collection
-{
-    return $this->pedidos;
-}
-
-public function addPedido(Pedido $pedido): static
-{
-    if (!$this->pedidos->contains($pedido)) {
-        $this->pedidos->add($pedido);
-        $pedido->setUsuario($this);
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
     }
 
-    return $this;
-}
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+        return $this;
+    }
 
-public function removePedido(Pedido $pedido): static
-{
-    if ($this->pedidos->removeElement($pedido)) {
-        // set the owning side to null (unless already changed)
-        if ($pedido->getUsuario() === $this) {
-            $pedido->setUsuario(null);
+    public function getPedidos(): Collection
+    {
+        return $this->pedidos;
+    }
+
+    public function addPedido(Pedido $pedido): static
+    {
+        if (!$this->pedidos->contains($pedido)) {
+            $this->pedidos->add($pedido);
+            $pedido->setUsuario($this);
         }
+        return $this;
     }
 
-    return $this;
-}
-
-
-
+    public function removePedido(Pedido $pedido): static
+    {
+        if ($this->pedidos->removeElement($pedido)) {
+            if ($pedido->getUsuario() === $this) {
+                $pedido->setUsuario(null);
+            }
+        }
+        return $this;
+    }
 }
